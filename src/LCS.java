@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.lang.String;
 import java.util.Random;
+import java.io.IOException;
+import java.nio.file.*;
+
 
 
 public class LCS {
@@ -11,7 +14,7 @@ public class LCS {
     static String ResultsFolderPath = "/home/matt/Results/"; // pathname to results folder
     static FileWriter resultsFile;
     static PrintWriter resultsWriter;
-    static int numberOfTrials = 10;
+    static int numberOfTrials = 1;
     static String S1 = "aaaaaaaaaaaaaaaaaaaa";
     static String S2 = "aaaaaaaaaaaaaaaaaaaa";
     static String lcs;
@@ -40,20 +43,32 @@ public class LCS {
         resultsWriter.println("#Trial  SubString           AvgTime"); // # marks a comment in gnuplot data
         resultsWriter.flush();
 
-        // Create my random strings
-        S1 = randomString(str);
-        S2 = randomString(str);
+        try {
+            S1 = readFile("/home/matt/Results/book1.txt");
+            S2 = readFile("/home/matt/Results/book2.txt");
+        } catch(Exception e) {
+            System.out.println(" Error!! ");
+            return;
+        }
 
-        System.out.println("String 1: " + S1);
-        System.out.println("String 2: " + S2);
+        String S3 = concatenate(S1);
+        String S4 = concatenate(S2);
+
+
+        // Create my random strings
+        //S1 = randomString(str);
+        //S2 = randomString(str);
+
+        System.out.println("String 1: " + S3);
+        System.out.println("String 2: " + S4);
 
 
         for (trial = 0; trial < numberOfTrials; ++trial) {
             stopwatch.start(); // Start timer in nano secs
 
-            for (i = 0; i < 100; ++i) {
+            for (i = 0; i < 1; ++i) {
                 //lcs = LcsBrute(S1, S2);
-                lcs = Lcs2D(S1, S2);
+                lcs = Lcs2D(S3, S4);
 
             }
             elapsedTime = stopwatch.elapsedTime();
@@ -64,6 +79,23 @@ public class LCS {
 
         // Call function printString to display the lcs
         printString(lcs);
+    }
+
+    public static String concatenate (String str) {
+        char[] strArray = str.toCharArray();
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < strArray.length; ++i) {
+            if ((strArray[i] != ' ') && (strArray[i] != '\t' && (strArray[i] != '\n'))) {
+                stringBuffer.append(strArray[i]);
+            }
+        }
+        String noSpaceStr2 = stringBuffer.toString();
+        return noSpaceStr2;
+    }
+
+    public static String readFile (String file)throws Exception {
+        file = new String (Files.readAllBytes(Paths.get(file)));
+        return file;
     }
 
     public static String randomString (String Str) {
