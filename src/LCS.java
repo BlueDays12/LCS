@@ -11,9 +11,9 @@ public class LCS {
     static String ResultsFolderPath = "/home/matt/Results/"; // pathname to results folder
     static FileWriter resultsFile;
     static PrintWriter resultsWriter;
-    static int numberOfTrials = 1;
-    static String S1 = "e";
-    static String S2 = "dkjfaddjfkjakdjfjaelksjdjfdkfasldkj";
+    static int numberOfTrials = 3;
+    static String S1 = "aaaaaaaaaaaaaaaaaaaa";
+    static String S2 = "aaaaaaaaaaaaaaaaaaaa";
     static String lcs;
 
     public static void main(String[] args) {
@@ -46,8 +46,9 @@ public class LCS {
         for (trial = 0; trial < numberOfTrials; ++trial) {
             stopwatch.start(); // Start timer in nano secs
 
-            for (i = 0; i < 10; ++i) {
+            for (i = 0; i < 100; ++i) {
                 lcs = LcsBrute(S1, S2);
+                //lcs = Lcs2D(S1, S2);
             }
             elapsedTime = stopwatch.elapsedTime();
             double averageTimePerTrialInBatch = (double) elapsedTime / (double)numberOfTrials;
@@ -57,6 +58,43 @@ public class LCS {
 
         // Call function printString to display the lcs
         printString(lcs);
+    }
+
+    public static String Lcs2D (String S1, String S2) {
+        int StartIndex = 0, MaxSoFar = 0;
+
+        // Need the length of our strings
+        int len1 = S1.length();
+        int len2 = S2.length();
+
+        // Create lcsArray
+        int[][] lcsArray = new int[len1][len2];
+
+        // Need to keep track of the last index
+        int k = 0;
+
+        for (int i = 0; i < len1; ++i) {
+            for (int j = 0; j < len2; ++j) {
+                // Put matching characters from the string and mark them
+                if (S1.charAt(i) == S2.charAt(j)) {
+                    if (i == 0 || j == 0) {
+                        // Mark those elements
+                        lcsArray[i][j] = 1;
+                    }
+                    else {
+                        lcsArray[i][j] = lcsArray[i-1][j-1]+1;
+                    }
+                    // Find where the last matching index is and make that k
+                    if (MaxSoFar < lcsArray[i][j]) {
+                        MaxSoFar = lcsArray[i][j];
+                        k = i;
+                    }
+                }
+            }
+        }
+
+        // The longest substring up to k
+        return S1.substring(k-MaxSoFar+1, k+1);
     }
 
     public static String LcsBrute(String S1, String S2) {
