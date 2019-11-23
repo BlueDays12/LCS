@@ -11,7 +11,7 @@ public class LCS {
     static String ResultsFolderPath = "/home/matt/Results/"; // pathname to results folder
     static FileWriter resultsFile;
     static PrintWriter resultsWriter;
-    static int numberOfTrials = 3;
+    static int numberOfTrials = 10;
     static String S1 = "aaaaaaaaaaaaaaaaaaaa";
     static String S2 = "aaaaaaaaaaaaaaaaaaaa";
     static String lcs;
@@ -26,6 +26,7 @@ public class LCS {
         long elapsedTime = 0;
         System.gc();
         int i, trial;
+        String str = "";
 
         // To open a file to write to
         try {
@@ -39,6 +40,10 @@ public class LCS {
         resultsWriter.println("#Trial  SubString           AvgTime"); // # marks a comment in gnuplot data
         resultsWriter.flush();
 
+        // Create my random strings
+        S1 = randomString(str);
+        S2 = randomString(str);
+
         System.out.println("String 1: " + S1);
         System.out.println("String 2: " + S2);
 
@@ -47,8 +52,9 @@ public class LCS {
             stopwatch.start(); // Start timer in nano secs
 
             for (i = 0; i < 100; ++i) {
-                lcs = LcsBrute(S1, S2);
-                //lcs = Lcs2D(S1, S2);
+                //lcs = LcsBrute(S1, S2);
+                lcs = Lcs2D(S1, S2);
+
             }
             elapsedTime = stopwatch.elapsedTime();
             double averageTimePerTrialInBatch = (double) elapsedTime / (double)numberOfTrials;
@@ -58,6 +64,20 @@ public class LCS {
 
         // Call function printString to display the lcs
         printString(lcs);
+    }
+
+    public static String randomString (String Str) {
+        int a = 97, z = 122;
+        int length = 20;
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder(length);
+        for (int i = 0; i < length; ++i) {
+            int getInt = a + (int) (random.nextFloat() * (z - a + 1));
+            buffer.append((char) getInt);
+        }
+        String myRandomString = buffer.toString();
+
+        return myRandomString;
     }
 
     public static String Lcs2D (String S1, String S2) {
