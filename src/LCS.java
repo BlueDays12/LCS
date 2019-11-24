@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.lang.String;
 import java.util.Random;
-import java.io.IOException;
 import java.nio.file.*;
 
 
@@ -14,33 +13,37 @@ public class LCS {
     static String ResultsFolderPath = "/home/matt/Results/"; // pathname to results folder
     static FileWriter resultsFile;
     static PrintWriter resultsWriter;
-    static int numberOfTrials = 1;
+    static int numberOfTrials = 3;
     static String S1 = "aaaaaaaaaaaaaaaaaaaa";
     static String S2 = "aaaaaaaaaaaaaaaaaaaa";
     static String lcs;
 
     public static void main(String[] args) {
-
-        program("lab7.txt");
+        // run the whole experiment at least twice, and expect to throw away the data from the earlier runs, before java has fully optimized
+        System.out.println("Running first full experiment...");
+        program("lab7-1.txt");
+        System.out.println("Running second full experiment...");
+        program("lab7-2.txt");
+        System.out.println("Running third full experiment...");
+        program("lab7-3.txt");
     }
 
     static void program(String resultsFileName) {
         ThreadCpuStopWatch stopwatch = new ThreadCpuStopWatch(); // for timing an entire set of trials
-        long elapsedTime = 0;
-        System.gc();
+        int maxInput = 1000;
         int i, trial;
         String str = "";
 
         // To open a file to write to
         try {
-            resultsFile = new FileWriter(ResultsFolderPath + "lab7.txt");
+            resultsFile = new FileWriter(ResultsFolderPath + resultsFileName);
             resultsWriter = new PrintWriter(resultsFile);
         } catch(Exception e) {
             System.out.println("*****!!!!!  Had a problem opening the results file "+ResultsFolderPath+"lab6");
             return;
         }
 
-        resultsWriter.println("#Trial  SubString           AvgTime"); // # marks a comment in gnuplot data
+        resultsWriter.println("#InputSize       AvgTime"); // # marks a comment in gnuplot data
         resultsWriter.flush();
 
         try {
@@ -59,29 +62,48 @@ public class LCS {
         //S1 = randomString(str);
         //S2 = randomString(str);
 
-        System.out.println("String 1: " + S3);
-        System.out.println("String 2: " + S4);
+        //System.out.println("String 1: " + S3);
+        //System.out.println("String 2: " + S4);
 
 
-        for (trial = 0; trial < numberOfTrials; ++trial) {
+        for (int inputSize = 1; inputSize < maxInput; inputSize*=2) {
+            long elapsedTime = 0;
+            System.gc();
+
             stopwatch.start(); // Start timer in nano secs
 
-            for (i = 0; i < 1; ++i) {
-                //lcs = LcsBrute(S1, S2);
-                lcs = Lcs2D(S3, S4);
+            for (i = 0; i < 10; ++i) {
 
+                S1 = ranStartIndex(S3, inputSize);
+                S2 = ranStartIndex(S4, inputSize);
+                System.out.println("String 1: " + S1);
+                System.out.println("String 2: " + S2);
+                lcs = LcsBrute(S1, S2);
+                //lcs = Lcs2D(S1, S2);
+
+                // Call function printString to display the lcs
+                printString(lcs);
             }
             elapsedTime = stopwatch.elapsedTime();
             double averageTimePerTrialInBatch = (double) elapsedTime / (double)numberOfTrials;
-            resultsWriter.printf("%-7d %-7S %20f \n", trial, lcs, averageTimePerTrialInBatch);
+            resultsWriter.printf("%-7d %20f \n", inputSize, averageTimePerTrialInBatch);
             resultsWriter.flush();
         }
 
-        // Call function printString to display the lcs
-        printString(lcs);
+
+    }
+
+    public static String ranStartIndex (String str, int N) {
+        int length = str.length();
+        Random random = new Random();
+        int ranStart = random.nextInt(length-1);
+
+        return str.substring(ranStart, (ranStart + N));
     }
 
     public static String concatenate (String str) {
+        int length = str.length();
+        int N = 30;
         char[] strArray = str.toCharArray();
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < strArray.length; ++i) {
@@ -90,7 +112,13 @@ public class LCS {
             }
         }
         String noSpaceStr2 = stringBuffer.toString();
+
         return noSpaceStr2;
+
+        //Random random = new Random();
+        //int ranStart = random.nextInt(length-1);
+
+        //return noSpaceStr2.substring(ranStart, (ranStart + N));
     }
 
     public static String readFile (String file)throws Exception {
